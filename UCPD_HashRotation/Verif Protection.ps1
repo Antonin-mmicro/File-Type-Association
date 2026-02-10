@@ -2,6 +2,8 @@ $path = "$env:TEMP\ViveTool\"
 $function1 = "43229420"
 $function2 = "27623730"
 
+[int]$exit_code = "0"
+
 if (Test-Path $path) {
 
 } else {
@@ -47,6 +49,7 @@ function Is-UserEnabled($featureID) {
 if (Is-UserEnabled $function1) {
     Write-Output "La fonctionnalité 43229420 est activée"
     Write-Host "Veuillez désactiver la rotation de hash en utilisant le bouton correspondant"
+    [int]$exit_code = [int]$exit_code + 1
 } else {
     
 }
@@ -55,6 +58,7 @@ if (Is-UserEnabled $function1) {
 if (Is-UserEnabled $function2) {
     Write-Output "La fonctionnalité 27623730 est activée"
     Write-Host "Veuillez désactiver la rotation de hash en utilisant le bouton correspondant"
+    [int]$exit_code = [int]$exit_code + 5
 } else {
     
 }
@@ -64,6 +68,8 @@ Pop-Location
 $service = Get-Service -Name UCPD -ErrorAction Stop
 if ($service.Status -ne 'Stopped') {
     Write-Host "Le service UCPD est toujours actif. Veuillez le désactiver en utilisant le bouton correspondant et en redémarrant la machine."
+    [int]$exit_code = [int]$exit_code + 10
 } else {
     
 }
+exit $exit_code
