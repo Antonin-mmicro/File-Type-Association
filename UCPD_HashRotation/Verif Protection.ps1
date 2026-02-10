@@ -5,7 +5,7 @@ $function2 = "27623730"
 [int]$exit_code = "0"
 
 if (Test-Path $path) {
-
+	
 } else {
     Write-Host "ViveTool n'est pas installé, Installation en cours..."
     $repo = "thebookisclosed/ViVe"
@@ -37,30 +37,28 @@ if (Test-Path $path) {
     Write-Host "ViveTool installé dans : $path"
 }
 Push-Location $path
+$viveQuery = .\ViveTool.exe /query
 function Is-UserEnabled($featureID) {
-    $test = .\ViveTool.exe /query | Select-String -Pattern $featureID -Context 0,4
-    # On ne regarde que le scope User
-    $enabled = $test | ForEach-Object { $_.Line, $_.Context.PostContext } |
-               Where-Object { $_ -match "Priority\s+: User" -and $_ -match "State\s+: Enabled \(2\)" }
-    return ($enabled.Count -gt 0)
+    $result = .\ViveTool.exe /query $featureID
+
+    return (
+        $result -match "State\s*:\s*Enabled \(2\)" -and
+        $result -match "Priority\s*:\s*User"
+    )
 }
+
+
 
 # Vérification pour 43229420
+
 if (Is-UserEnabled $function1) {
-    Write-Output "La fonctionnalité 43229420 est activée"
-    Write-Host "Veuillez désactiver la rotation de hash en utilisant le bouton correspondant"
-    [int]$exit_code = [int]$exit_code + 1
-} else {
-    
+    Write-Host "La fonctionnalité 43229420 est activée"
+    $exit_code += 1
 }
 
-# Vérification pour 27623730
 if (Is-UserEnabled $function2) {
-    Write-Output "La fonctionnalité 27623730 est activée"
-    Write-Host "Veuillez désactiver la rotation de hash en utilisant le bouton correspondant"
-    [int]$exit_code = [int]$exit_code + 5
-} else {
-    
+    Write-Host "La fonctionnalité 27623730 est activée"
+    $exit_code += 5
 }
 Pop-Location
 
@@ -68,8 +66,10 @@ Pop-Location
 $service = Get-Service -Name UCPD -ErrorAction Stop
 if ($service.Status -ne 'Stopped') {
     Write-Host "Le service UCPD est toujours actif. Veuillez le désactiver en utilisant le bouton correspondant et en redémarrant la machine."
-    [int]$exit_code = [int]$exit_code + 10
+    $exit_code += 10
+    
 } else {
     
 }
+Write-Host "$exit_code"
 exit $exit_code
