@@ -130,6 +130,7 @@ Sans les droits administrateur :
 ├── UCPD_HashRotation/
 │ ├── UCPD.ps1
 │ └── HashRotation.ps1
+| └── Verif Protection.ps1
 └── README.md
 
 
